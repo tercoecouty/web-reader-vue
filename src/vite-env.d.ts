@@ -106,4 +106,5 @@ interface ISelection {
     text: string;
 }
 
-declare function $ref<Type>(value: Type): Type {};
+// declare function $ref<Type>(value: Type): Type {};
+// declare function $computed<Type>(fn: () => Type): Type {};

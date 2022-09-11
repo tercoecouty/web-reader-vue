@@ -1,21 +1,17 @@
 <script setup lang="ts">
-import { computed } from "vue";
-
 interface ISwitchProps {
     checked?: boolean;
-    onChange?: () => void;
+}
+interface ISwitchEmits {
+    (e: "update:checked", value: boolean): void;
 }
 
-const props = defineProps<ISwitchProps>();
-const checked = computed(() => (props.checked ? true : false));
-
-function handleChange() {
-    if (props.onChange) props.onChange();
-}
+defineEmits<ISwitchEmits>();
+defineProps<ISwitchProps>();
 </script>
 
 <template>
-    <div class="switch" :class="{ checked }" @click="handleChange">
+    <div class="switch" :class="{ checked }" @click="$emit('update:checked', !checked)">
         <span class="slider"></span>
     </div>
 </template>

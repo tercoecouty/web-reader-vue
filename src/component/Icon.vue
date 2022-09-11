@@ -2,9 +2,13 @@
 import { ref, onMounted, onUpdated } from "vue";
 interface IIconProps {
     svg: string;
-    onClick?: () => void;
     disabled?: boolean;
 }
+interface IIconEmits {
+    (e: "click"): void;
+}
+
+const emit = defineEmits<IIconEmits>();
 const props = defineProps<IIconProps>();
 const spanRef = ref(null);
 
@@ -16,12 +20,12 @@ onUpdated(() => {
 });
 
 function handleClick() {
-    if (!props.disabled && props.onClick) props.onClick();
+    if (!props.disabled) emit("click");
 }
 </script>
 
 <template>
-    <span @click="handleClick" class="icon" :class="{ disabled: props.disabled }" ref="spanRef"></span>
+    <span @click="handleClick" class="icon" :class="{ disabled }" ref="spanRef"></span>
 </template>
 
 <style lang="less">

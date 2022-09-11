@@ -22,28 +22,14 @@ watch(showSettings, () => {
     }
 });
 
-function toggleTwoPage() {
-    twoPage.value = !twoPage.value;
+watch([twoPage, indent, lineSpacing], () => {
     hasChange.value = true;
-}
-function handleIndentChange(value: number) {
-    indent.value = value;
-    hasChange.value = true;
-}
-function handleLineSpacingChange(value: number) {
-    lineSpacing.value = value;
-    hasChange.value = true;
-}
+});
+
 function saveSettings() {
-    if (twoPage.value !== bookStore.twoPage) {
-        bookStore.twoPage = twoPage.value;
-    }
-    if (indent.value !== bookStore.indent) {
-        bookStore.indent = indent.value;
-    }
-    if (lineSpacing.value !== bookStore.lineSpacing) {
-        bookStore.lineSpacing = lineSpacing.value;
-    }
+    bookStore.twoPage = twoPage.value;
+    bookStore.indent = indent.value;
+    bookStore.lineSpacing = lineSpacing.value;
     hasChange.value = false;
 }
 </script>
@@ -52,15 +38,15 @@ function saveSettings() {
     <div class="settings">
         <div class="settings-item">
             <span>双页显示</span>
-            <Switch :checked="twoPage" :onChange="toggleTwoPage" />
+            <Switch v-model:checked="twoPage" />
         </div>
         <div class="settings-item">
             <span>缩进</span>
-            <Select :options="[0, 1, 2, 4]" :value="indent" :onChange="handleIndentChange" />
+            <Select :options="[0, 1, 2, 4]" v-model:value="indent" />
         </div>
         <div class="settings-item">
             <span>行间距</span>
-            <Select :options="[0, 2, 6, 10]" :value="lineSpacing" :onChange="handleLineSpacingChange" />
+            <Select :options="[0, 2, 6, 10]" v-model:value="lineSpacing" />
         </div>
         <div v-if="hasChange" class="settings-save" @click="saveSettings">保存设置</div>
     </div>

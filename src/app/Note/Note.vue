@@ -96,15 +96,15 @@ watch(showNoteInfo, () => {
             <NoteImages v-if="note.imageUrls.length !== 0" :urls="note.imageUrls" />
             <div class="note-buttons">
                 <div>
-                    <Icon :svg="CommentSvg" :onClick="handleAddComment" />
-                    <Icon v-if="liked" :svg="LikeFilledSvg" :onClick="() => likeStore.unlike(liked.id)" />
-                    <Icon v-else :svg="LikeSvg" :onClick="() => likeStore.like(currentNoteId)" />
+                    <Icon :svg="CommentSvg" @click="handleAddComment" />
+                    <Icon v-if="liked" :svg="LikeFilledSvg" @click="likeStore.unlike(liked.id)" />
+                    <Icon v-else :svg="LikeSvg" @click="likeStore.like(currentNoteId)" />
                 </div>
                 <div v-if="appStore.noteUser.id === appStore.loginUser.id">
-                    <Icon :svg="EditSvg" :onClick="editNote" />
+                    <Icon :svg="EditSvg" @click="editNote" />
                     <Icon
                         :svg="DeleteSvg"
-                        :onClick="() => noteStore.updateNote(currentNoteId, '', [])"
+                        @click="noteStore.updateNote(currentNoteId, '', [])"
                         :disabled="note.content === '' && note.imageUrls.length === 0"
                     />
                 </div>
@@ -131,12 +131,12 @@ watch(showNoteInfo, () => {
                                 <div class="comment-buttons">
                                     <Icon
                                         :svg="CommentSvg"
-                                        :onClick="() => handleReplyComment(comment.fromUserId, comment.fromUserName)"
+                                        @click="handleReplyComment(comment.fromUserId, comment.fromUserName)"
                                     />
                                     <Icon
                                         v-if="comment.fromUserId === appStore.loginUser.id"
                                         :svg="DeleteSvg"
-                                        :onClick="() => commentStore.deleteComment(comment.id)"
+                                        @click="commentStore.deleteComment(comment.id)"
                                     />
                                 </div>
                             </div>

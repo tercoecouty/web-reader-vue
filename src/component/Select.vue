@@ -4,16 +4,19 @@ import { Icon } from "./index";
 import { DownSvg } from "../svg";
 
 interface ISelectProps {
-    options: any[];
-    value: any;
-    onChange?: (value: number) => void;
+    options: number[];
+    value: number;
+}
+interface ISelectEmits {
+    (e: "update:value", value: number): void;
 }
 
+const emit = defineEmits<ISelectEmits>();
 const props = defineProps<ISelectProps>();
 const showOptions = ref(false);
 
 function handleChange(value: number) {
-    if (props.onChange) props.onChange(value);
+    emit("update:value", value);
     showOptions.value = false;
 }
 </script>
@@ -21,16 +24,11 @@ function handleChange(value: number) {
 <template>
     <div class="select">
         <div class="select-face" @click="showOptions = !showOptions">
-            <span class="select-value">{{ props.value }}</span>
+            <span class="select-value">{{ value }}</span>
             <Icon :svg="DownSvg" />
         </div>
         <div v-if="showOptions" class="select-options">
-            <div
-                v-for="option in props.options"
-                class="select-options-item"
-                :key="option"
-                @click="handleChange(option)"
-            >
+            <div v-for="option in options" class="select-options-item" :key="option" @click="handleChange(option)">
                 {{ option }}
             </div>
         </div>

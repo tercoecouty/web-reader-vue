@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, onMounted } from "vue";
+import { watch, onMounted } from "vue";
 import { Icon, Drawer } from "../../component";
 import { ArrowLeftSvg, ArrowRightSvg, UnderlineSvg, EditSvg, DeleteSvg, EyeSvg } from "../../svg";
 import { useAppStore, useBookStore, useNoteStore } from "../../store";
@@ -9,9 +9,6 @@ import Note from "../Note/Note.vue";
 const appStore = useAppStore();
 const bookStore = useBookStore();
 const noteStore = useNoteStore();
-
-const currentNoteId = computed(() => bookStore.currentNoteId);
-
 function handleAddNote() {
     if (!bookStore.selection || appStore.noteUser.id !== appStore.loginUser.id) return;
 
@@ -86,33 +83,36 @@ onMounted(() => {
     window.onkeydown = handleKeyEvent;
 });
 
-watch(currentNoteId, () => {
-    if (currentNoteId && appStore.noteUser.id !== appStore.loginUser.id) {
-        appStore.showNoteInfo = true;
+watch(
+    () => bookStore.currentNoteId,
+    () => {
+        if (bookStore.currentNoteId && appStore.noteUser.id !== appStore.loginUser.id) {
+            appStore.showNoteInfo = true;
+        }
     }
-});
+);
 </script>
 
 <template>
     <div class="right-sidebar">
-        <Icon :svg="ArrowLeftSvg" :onClick="handlePrevPage" :disabled="bookStore.pageNumber === 1" />
-        <Icon :svg="ArrowRightSvg" :onClick="handleNextPage" :disabled="!bookStore.canNextPage" />
+        <Icon :svg="ArrowLeftSvg" @click="handlePrevPage" :disabled="bookStore.pageNumber === 1" />
+        <Icon :svg="ArrowRightSvg" @click="handleNextPage" :disabled="!bookStore.canNextPage" />
         <Icon
             :svg="UnderlineSvg"
-            :onClick="handleAddNote"
+            @click="handleAddNote"
             :disabled="!bookStore.selection || appStore.noteUser.id !== appStore.loginUser.id"
         />
         <Icon
             :svg="DeleteSvg"
-            :onClick="handleDeleteNote"
+            @click="handleDeleteNote"
             :disabled="!bookStore.currentNoteId || appStore.noteUser.id !== appStore.loginUser.id"
         />
         <Icon
             :svg="appStore.noteUser?.id === appStore.loginUser?.id ? EditSvg : EyeSvg"
-            :onClick="() => appStore.setShowNoteInfo(true)"
+            @click="appStore.setShowNoteInfo(true)"
             :disabled="!bookStore.currentNoteId"
         />
-        <Drawer :visible="appStore.showNoteInfo" position="right" :onClose="hideNoteInfo" width="30%">
+        <Drawer :visible="appStore.showNoteInfo" position="right" @close="hideNoteInfo" width="30%">
             <Note />
         </Drawer>
     </div>

@@ -3,9 +3,12 @@ import { ref, onMounted } from "vue";
 
 interface IPromptProps {
     userName: string;
-    onClose: () => void;
+}
+interface IPromptEmits {
+    (e: "close"): void;
 }
 
+const emit = defineEmits<IPromptEmits>();
 const props = defineProps<IPromptProps>();
 const show = ref(false);
 
@@ -14,14 +17,14 @@ onMounted(() => {
 });
 
 function handleTransEnd() {
-    if (!show.value) props.onClose();
+    if (!show.value) emit("close");
 }
 </script>
 
 <template>
     <div class="view-others-prompt" :class="{ show }" @transitionend="handleTransEnd">
         <span>
-            正在查看 <span>{{ props.userName }}</span> 的笔记，点击 <button @click="show = false">退出</button>
+            正在查看 <span>{{ userName }}</span> 的笔记，点击 <button @click="show = false">退出</button>
         </span>
     </div>
 </template>

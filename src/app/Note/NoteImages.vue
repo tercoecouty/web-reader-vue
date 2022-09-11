@@ -43,8 +43,8 @@ function clickUpload() {
         <div v-for="url in props.urls" class="image-item" :key="url">
             <img :src="url" />
             <div class="image-item-hover">
-                <Icon v-if="props.onDelete" :svg="DeleteSvg" :onClick="() => props.onDelete(url)" />
-                <Icon :svg="EyeSvg" :onClick="() => handleShowPreview(url)" />
+                <Icon v-if="props.onDelete" :svg="DeleteSvg" @click="props.onDelete(url)" />
+                <Icon :svg="EyeSvg" @click="handleShowPreview(url)" />
             </div>
         </div>
         <div v-if="props.onUpload && props.urls.length < 9" class="image-upload" @click="clickUpload">

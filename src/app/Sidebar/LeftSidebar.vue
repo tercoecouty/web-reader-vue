@@ -15,84 +15,59 @@ const appStore = useAppStore();
 
 <template>
     <div class="left-sidebar">
-        <Icon :svg="TeamSvg" :onClick="() => appStore.setShowClasses(true)" />
+        <Icon :svg="TeamSvg" @click="appStore.setShowClasses(true)" />
         <Icon
             :svg="BarsSvg"
-            :onClick="() => appStore.setShowNotes(true)"
+            @click="appStore.setShowNotes(true)"
             :disabled="appStore.noteUser?.id !== appStore.loginUser?.id"
         />
         <Icon
             :svg="BookSvg"
-            :onClick="() => appStore.setShowBookmarks(true)"
+            @click="appStore.setShowBookmarks(true)"
             :disabled="appStore.noteUser?.id !== appStore.loginUser?.id"
         />
         <Icon
             :svg="SearchSvg"
-            :onClick="() => appStore.setShowSearch(true)"
+            @click="appStore.setShowSearch(true)"
             :disabled="appStore.noteUser?.id !== appStore.loginUser?.id"
         />
         <Icon
             :svg="BookshelfSvg"
-            :onClick="() => appStore.setShowBookshelf(true)"
+            @click="appStore.setShowBookshelf(true)"
             :disabled="appStore.noteUser?.id !== appStore.loginUser?.id"
         />
         <Icon
             :svg="SettingSvg"
-            :onClick="() => appStore.setShowSettings(true)"
+            @click="appStore.setShowSettings(true)"
             :disabled="appStore.noteUser?.id !== appStore.loginUser?.id"
         />
-        <Drawer
-            :visible="appStore.showClasses"
-            title="班级列表"
-            position="left"
-            :onClose="() => (appStore.showClasses = false)"
-        >
+        <Drawer :visible="appStore.showClasses" title="班级列表" position="left" @close="appStore.showClasses = false">
             <Classes />
         </Drawer>
-        <Drawer
-            :visible="appStore.showNotes"
-            title="笔记"
-            position="left"
-            :onClose="() => (appStore.showNotes = false)"
-        >
+        <Drawer :visible="appStore.showNotes" title="笔记" position="left" @close="appStore.showNotes = false">
             <Notes />
         </Drawer>
-        <Drawer
-            :visible="appStore.showBookmarks"
-            title="书签"
-            position="left"
-            :onClose="() => (appStore.showBookmarks = false)"
-        >
+        <Drawer :visible="appStore.showBookmarks" title="书签" position="left" @close="appStore.showBookmarks = false">
             <Bookmarks />
         </Drawer>
-        <Drawer
-            :visible="appStore.showSearch"
-            title="搜索"
-            position="left"
-            :onClose="() => (appStore.showSearch = false)"
-        >
+        <Drawer :visible="appStore.showSearch" title="搜索" position="left" @close="appStore.showSearch = false">
             <Search />
         </Drawer>
         <Drawer
             :visible="appStore.showBookshelf"
             title="班级书架"
             position="left"
-            :onClose="() => (appStore.showBookshelf = false)"
+            @close="appStore.showBookshelf = false"
         >
             <Bookshelf />
         </Drawer>
-        <Drawer
-            :visible="appStore.showSettings"
-            title="搜索"
-            position="left"
-            :onClose="() => (appStore.showSettings = false)"
-        >
+        <Drawer :visible="appStore.showSettings" title="搜索" position="left" @close="appStore.showSettings = false">
             <Settings />
         </Drawer>
         <Prompt
             v-if="appStore.noteUser?.id !== appStore.loginUser?.id"
             :userName="appStore.noteUser.name"
-            :onClose="() => (appStore.noteUser = appStore.loginUser)"
+            @close="appStore.noteUser = appStore.loginUser"
         />
     </div>
 </template>

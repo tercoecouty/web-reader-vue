@@ -83,7 +83,7 @@ async function submit() {
 <template>
     <div class="note-edit" :class="{ show }" @transitionend="handleTransEnd">
         <div class="note-edit-header">
-            <Icon :svg="ArrowLeftSvg" :onClick="() => (show = false)" />
+            <Icon :svg="ArrowLeftSvg" @click="show = false" />
             <span class="header-text">{{ headerText }}</span>
         </div>
         <div class="scroll-container">
@@ -97,7 +97,7 @@ async function submit() {
         </div>
         <div class="note-edit-submit">
             <span class="letter-count">{{ value.length }} / 200</span>
-            <Icon :svg="SendSvg" :onClick="submit" :disabled="!hasChange" />
+            <Icon :svg="SendSvg" @click="submit" :disabled="!hasChange" />
         </div>
     </div>
 </template>

@@ -1,28 +1,37 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
+
 interface IDrawerProps {
     visible: Boolean;
     title?: string;
     position: "right" | "left";
-    onClose: () => void;
+}
+interface IDrawerEmits {
+    (e: "close"): void;
 }
 
+const emit = defineEmits<IDrawerEmits>();
 const props = defineProps<IDrawerProps>();
-const visible = computed(() => props.visible);
 const show = ref(false);
 const _visible = ref(false);
-watch(visible, () => {
-    if (visible.value) {
-        _visible.value = true;
-        requestAnimationFrame(() => (show.value = true));
-    } else {
-        show.value = false;
+
+watch(
+    () => props.visible,
+    () => {
+        if (props.visible) {
+            _visible.value = true;
+            requestAnimationFrame(() => {
+                show.value = true;
+            });
+        } else {
+            show.value = false;
+        }
     }
-});
+);
 
 function handleTransEnd(e) {
     if (!show.value && e.propertyName === "transform") {
-        props.onClose();
+        emit("close");
         _visible.value = false;
     }
 }
@@ -31,9 +40,9 @@ function handleTransEnd(e) {
 <template>
     <div class="drawer" :class="{ show, visible: _visible }" @transitionend="handleTransEnd">
         <div class="drawer-background" @click="() => (show = false)"></div>
-        <div class="drawer-container" :class="{ left: props.position === 'left', right: props.position === 'right' }">
+        <div class="drawer-container" :class="{ left: position === 'left', right: position === 'right' }">
             <div v-if="title" class="drawer-header">
-                <div>{{ props.title }}</div>
+                <div>{{ title }}</div>
             </div>
             <div>
                 <slot></slot>
