@@ -8,3 +8,6 @@ const pinia = createPinia();
 
 app.use(pinia);
 app.mount("#app");
+
+// import Demo from "./app/Demo.vue";
+// createApp(Demo).mount("#app");
