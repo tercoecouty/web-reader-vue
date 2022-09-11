@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import { $computed } from "vue/macros";
 import { useBookStore, useNoteStore, useAppStore } from "../../store";
 
@@ -145,7 +144,7 @@ function renderSpansWithHighlight() {
         }
 
         let isHighlightChar = false;
-        if (searchRange.value && searchRange.value.firstCharId <= charId && charId <= searchRange.value.lastCharId) {
+        if (searchRange && searchRange.firstCharId <= charId && charId <= searchRange.lastCharId) {
             isHighlightChar = true;
         }
 
@@ -177,8 +176,8 @@ function renderSpansWithHighlight() {
     return domSpans;
 }
 
-const domSpans = computed(() => {
-    return searchRange.value ? renderSpansWithHighlight() : renderSpans();
+const domSpans = $computed(() => {
+    return searchRange ? renderSpansWithHighlight() : renderSpans();
 });
 </script>
 

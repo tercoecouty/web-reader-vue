@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { $ref } from "vue/macros";
 
 interface IPromptProps {
     userName: string;
@@ -9,15 +10,15 @@ interface IPromptEmits {
 }
 
 const emit = defineEmits<IPromptEmits>();
-const props = defineProps<IPromptProps>();
-const show = ref(false);
+defineProps<IPromptProps>();
+let show = $ref(false);
 
 onMounted(() => {
-    requestAnimationFrame(() => (show.value = true));
+    requestAnimationFrame(() => (show = true));
 });
 
 function handleTransEnd() {
-    if (!show.value) emit("close");
+    if (!show) emit("close");
 }
 </script>
 
