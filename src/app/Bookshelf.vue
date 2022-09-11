@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { watch, computed } from "vue";
+import { watch } from "vue";
+import { $toRef, $$ } from "vue/macros";
 import { useAppStore, useBookshelfStore } from "../store";
+
 const appStore = useAppStore();
 const bookshelfStore = useBookshelfStore();
+const bookId = $toRef(appStore, "bookId");
 
 function handleClick(bookId: number) {
     appStore.bookId = bookId;
-    appStore.setShowBookshelf(false);
+    appStore.showBookshelf = false;
 }
-
-const bookId = computed(() => appStore.bookId);
-watch(bookId, () => {
+watch($$(bookId), () => {
     for (const book of bookshelfStore.bookshelf) {
-        if (book.id === bookId.value) {
+        if (book.id === bookId) {
             document.title = book.title;
             return;
         }

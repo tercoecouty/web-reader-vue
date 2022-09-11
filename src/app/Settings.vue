@@ -1,36 +1,37 @@
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+import { watch } from "vue";
+import { $ref, $toRef, $$ } from "vue/macros";
 import { useAppStore, useBookStore } from "../store";
 import { Switch, Select } from "../component";
 
 const appStore = useAppStore();
 const bookStore = useBookStore();
 
-const hasChange = ref(false);
-const twoPage = ref(bookStore.twoPage);
-const indent = ref(bookStore.indent);
-const lineSpacing = ref(bookStore.lineSpacing);
+let hasChange = $ref(false);
+let twoPage = $ref(bookStore.twoPage);
+let indent = $ref(bookStore.indent);
+let lineSpacing = $ref(bookStore.lineSpacing);
 
-const showSettings = computed(() => appStore.showSettings);
+let showSettings = $toRef(appStore, "showSettings");
 
-watch(showSettings, () => {
-    if (!showSettings.value) {
-        twoPage.value = bookStore.twoPage;
-        indent.value = bookStore.indent;
-        lineSpacing.value = bookStore.lineSpacing;
-        hasChange.value = false;
+watch($$(showSettings), () => {
+    if (!showSettings) {
+        twoPage = bookStore.twoPage;
+        indent = bookStore.indent;
+        lineSpacing = bookStore.lineSpacing;
+        hasChange = false;
     }
 });
 
-watch([twoPage, indent, lineSpacing], () => {
-    hasChange.value = true;
+watch([$$(twoPage), $$(indent), $$(lineSpacing)], () => {
+    hasChange = true;
 });
 
 function saveSettings() {
-    bookStore.twoPage = twoPage.value;
-    bookStore.indent = indent.value;
-    bookStore.lineSpacing = lineSpacing.value;
-    hasChange.value = false;
+    bookStore.twoPage = twoPage;
+    bookStore.indent = indent;
+    bookStore.lineSpacing = lineSpacing;
+    hasChange = false;
 }
 </script>
 

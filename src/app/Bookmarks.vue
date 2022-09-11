@@ -7,7 +7,7 @@ const bookmarkStore = useBookmarkStore();
 
 function handleClick(pageNumber: number) {
     bookStore.setPageNumber(pageNumber);
-    appStore.setShowBookmarks(false);
+    appStore.showBookmarks = false;
 }
 </script>
 

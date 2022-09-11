@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, h } from "vue";
+import { computed } from "vue";
+import { $computed } from "vue/macros";
 import { useBookStore, useNoteStore, useAppStore } from "../../store";
 
 interface ILineProps {
@@ -17,26 +18,26 @@ interface IDomSpan {
     text: string;
 }
 
-const props = defineProps<ILineProps>();
+const { line } = defineProps<ILineProps>();
 const bookStore = useBookStore();
 const appStore = useAppStore();
 const noteStore = useNoteStore();
 
-const currentNoteId = computed(() => bookStore.getCurrentNoteIdByLine(props.line));
-const searchRange = computed(() => JSON.parse(appStore.getSearchRangeByLine(props.line)));
-const styleObject = computed(() => {
+const currentNoteId = $computed(() => bookStore.getCurrentNoteIdByLine(line));
+const searchRange = $computed(() => JSON.parse(appStore.getSearchRangeByLine(line)));
+const styleObject = $computed(() => {
     const style: any = {};
-    if (props.line.spacingType === "letter") {
-        style.letterSpacing = props.line.spacing + "px";
+    if (line.spacingType === "letter") {
+        style.letterSpacing = line.spacing + "px";
     } else {
-        style.wordSpacing = props.line.spacing + "px";
+        style.wordSpacing = line.spacing + "px";
     }
 
-    if (props.line.indent) {
+    if (line.indent) {
         style.marginLeft = bookStore.indent + "em";
     }
 
-    if (props.line.text === "") {
+    if (line.text === "") {
         style.height = "1.2em";
         style.boxSizing = "content-box";
     }
@@ -50,9 +51,9 @@ function renderSpans() {
     let lastNoteId = null;
     let index = 0;
     let isLastNoteChar = undefined;
-    for (; index < props.line.text.length; index++) {
-        const char = props.line.text[index];
-        const charId = props.line.firstCharId + index;
+    for (; index < line.text.length; index++) {
+        const char = line.text[index];
+        const charId = line.firstCharId + index;
 
         let isNoteChar = false;
         for (const note of noteStore.notes) {
@@ -96,12 +97,12 @@ function renderSpans() {
 
         isLastNoteChar = isNoteChar;
     }
-    spans.push({ text: text.slice(), noteId, firstCharId: props.line.firstCharId + index - text.length });
+    spans.push({ text: text.slice(), noteId, firstCharId: line.firstCharId + index - text.length });
 
     const domSpans: IDomSpan[] = [];
     for (const span of spans) {
         const { noteId, firstCharId, text } = span;
-        const selected = noteId && currentNoteId.value === noteId;
+        const selected = noteId && currentNoteId === noteId;
         const others = !selected && appStore.loginUser.id !== appStore.noteUser.id;
         if (noteId) {
             const classObject = { underline: true, selected, others };
@@ -129,9 +130,9 @@ function renderSpans() {
 }
 function renderSpansWithHighlight() {
     const domSpans: IDomSpan[] = [];
-    for (let index = 0; index < props.line.text.length; index++) {
-        const char = props.line.text[index];
-        const charId = props.line.firstCharId + index;
+    for (let index = 0; index < line.text.length; index++) {
+        const char = line.text[index];
+        const charId = line.firstCharId + index;
 
         let isNoteChar = false;
         let noteId = null;
@@ -149,7 +150,7 @@ function renderSpansWithHighlight() {
         }
 
         if (isNoteChar) {
-            const selected = noteId && currentNoteId.value === noteId;
+            const selected = noteId && currentNoteId === noteId;
             const others = !selected && appStore.loginUser.id !== appStore.noteUser.id;
 
             domSpans.push({

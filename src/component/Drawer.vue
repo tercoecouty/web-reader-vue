@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { watch } from "vue";
+import { $ref, $$ } from "vue/macros";
 import { useAppStore } from "../store";
 
 interface IDrawerProps {
@@ -14,28 +15,25 @@ interface IDrawerEmits {
 
 const appStore = useAppStore();
 const emit = defineEmits<IDrawerEmits>();
-const props = defineProps<IDrawerProps>();
-const show = ref(false);
-const _visible = ref(false);
+let { visible } = defineProps<IDrawerProps>();
+let show = $ref(false);
+let _visible = $ref(false);
 
-watch(
-    () => props.visible,
-    () => {
-        if (props.visible) {
-            _visible.value = true;
-            appStore.disableShortcut = true;
-            requestAnimationFrame(() => (show.value = true));
-        } else {
-            show.value = false;
-        }
+watch($$(visible), () => {
+    if (visible) {
+        _visible = true;
+        appStore.disableShortcut = true;
+        requestAnimationFrame(() => (show = true));
+    } else {
+        show = false;
     }
-);
+});
 
 function handleTransEnd(e) {
-    if (!show.value && e.propertyName === "transform") {
+    if (!show && e.propertyName === "transform") {
         emit("close");
         emit("update:visible", false);
-        _visible.value = false;
+        _visible = false;
         appStore.disableShortcut = false;
     }
 }

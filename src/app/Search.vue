@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { watch } from "vue";
+import { $ref, $$ } from "vue/macros";
 import { useAppStore, useBookStore } from "../store";
 
 const appStore = useAppStore();
 const bookStore = useBookStore();
-const value = ref("");
-const searchResult = ref<Generator>(null);
-const done = ref(false);
-const domResults = ref([]);
+let text = $ref("");
+let searchResult = $ref<Generator>(null);
+let done = $ref(false);
+let domResults = $ref([]);
 
 function indexOf(text, chars, index) {
     for (let i = index; i < text.length; i++) {
@@ -68,16 +69,16 @@ function* search(keyword: string) {
     }
 }
 function loadMore() {
-    if (!searchResult.value) return null;
+    if (!searchResult) return null;
 
     const _domResults = [];
     let count = 1;
     while (true) {
         if (count++ > 10) break;
 
-        const next = searchResult.value.next();
+        const next = searchResult.next();
         if (next.done) {
-            done.value = true;
+            done = true;
             break;
         }
 
@@ -98,52 +99,52 @@ function loadMore() {
         _domResults.push({ firstCharId, pageNumber, keyword, left, right });
     }
 
-    domResults.value = [...domResults.value, ..._domResults];
+    domResults = [...domResults, ..._domResults];
 }
 
-watch(searchResult, () => {
-    if (searchResult.value) loadMore();
-    else domResults.value = [];
+watch($$(searchResult), () => {
+    if (searchResult) loadMore();
+    else domResults = [];
 });
 
 function handleSearch() {
-    if (value.value === "") {
+    if (text === "") {
         appStore.searchRange = null;
-        searchResult.value = null;
+        searchResult = null;
     } else {
         appStore.searchRange = null;
-        const _searchResult = search(value.value);
-        searchResult.value = _searchResult;
+        const _searchResult = search(text);
+        searchResult = _searchResult;
     }
 
-    done.value = false;
-    domResults.value = [];
+    done = false;
+    domResults = [];
 }
 
 function handleClick(pageNumber: number, firstCharId: number, lastCharId: number) {
     appStore.searchRange = { firstCharId, lastCharId: lastCharId - 1 };
     bookStore.setPageNumber(pageNumber);
-    appStore.setShowSearch(false);
+    appStore.showSearch = false;
 }
 
 function handleInput(e) {
     const _value = e.target.value;
     if (_value.length > 10) return;
-    value.value = _value;
+    text = _value;
 }
 
 function handleClear() {
     appStore.searchRange = null;
-    value.value = "";
-    done.value = false;
-    searchResult.value = null;
+    text = "";
+    done = false;
+    searchResult = null;
 }
 </script>
 
 <template>
     <div class="search">
         <div class="search-header">
-            <input type="text" :value="value" @change="handleInput" />
+            <input type="text" :value="text" @change="handleInput" />
             <button @click="handleClear">清空</button>
             <button @click="handleSearch">搜索</button>
         </div>

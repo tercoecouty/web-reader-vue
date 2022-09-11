@@ -37,36 +37,7 @@ const initialState: IAppState = {
 
 export const useAppStore = defineStore("app", {
     state: () => initialState,
-    actions: {
-        setShowClasses(show: boolean) {
-            this.showClasses = show;
-            this.disableShortcut = show;
-        },
-        setShowBookmarks(show: boolean) {
-            this.showBookmarks = show;
-            this.disableShortcut = show;
-        },
-        setShowNotes(show: boolean) {
-            this.showBookmarks = show;
-            this.disableShortcut = show;
-        },
-        setShowSearch(show: boolean) {
-            this.showSearch = show;
-            this.disableShortcut = show;
-        },
-        setShowBookshelf(show: boolean) {
-            this.showBookshelf = show;
-            this.disableShortcut = show;
-        },
-        setShowSettings(show: boolean) {
-            this.showSettings = show;
-            this.disableShortcut = show;
-        },
-        setShowNoteInfo(show: boolean) {
-            this.showNoteInfo = show;
-            this.disableShortcut = show;
-        },
-    },
+    actions: {},
     getters: {
         getSearchRangeByLine: (state) => {
             return (line: ILine) => {

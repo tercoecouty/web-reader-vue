@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { $ref } from "vue/macros";
 import { Icon } from "./index";
 import { DownSvg } from "../svg";
 
@@ -12,12 +12,12 @@ interface ISelectEmits {
 }
 
 const emit = defineEmits<ISelectEmits>();
-const props = defineProps<ISelectProps>();
-const showOptions = ref(false);
+defineProps<ISelectProps>();
+let showOptions = $ref(false);
 
 function handleChange(value: number) {
     emit("update:value", value);
-    showOptions.value = false;
+    showOptions = false;
 }
 </script>
 

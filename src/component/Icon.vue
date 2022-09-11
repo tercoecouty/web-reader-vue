@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUpdated } from "vue";
+import { onMounted, onUpdated } from "vue";
+import { $ref } from "vue/macros";
 interface IIconProps {
     svg: string;
     disabled?: boolean;
@@ -9,18 +10,18 @@ interface IIconEmits {
 }
 
 const emit = defineEmits<IIconEmits>();
-const props = defineProps<IIconProps>();
-const spanRef = ref(null);
+const { svg, disabled } = defineProps<IIconProps>();
+let spanRef = $ref(null);
 
 onMounted(() => {
-    spanRef.value.innerHTML = props.svg;
+    spanRef.innerHTML = svg;
 });
 onUpdated(() => {
-    spanRef.value.innerHTML = props.svg;
+    spanRef.innerHTML = svg;
 });
 
 function handleClick() {
-    if (!props.disabled) emit("click");
+    if (!disabled) emit("click");
 }
 </script>
 

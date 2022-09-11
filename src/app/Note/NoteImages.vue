@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { $ref } from "vue/macros";
 import { Icon } from "../../component";
 import { DeleteSvg, EyeSvg } from "../../svg";
 
@@ -17,8 +17,8 @@ interface INoteImagesEmits {
 
 const emit = defineEmits<INoteImagesEmits>();
 defineProps<INoteImagesProps>();
-const previewUrl = ref("");
-const showPreview = ref(false);
+let previewUrl = $ref("");
+let showPreview = $ref(false);
 
 function handleFileChange(e) {
     const files = e.target.files as File[];
@@ -26,8 +26,8 @@ function handleFileChange(e) {
 }
 
 function handleShowPreview(url: string) {
-    previewUrl.value = url;
-    showPreview.value = true;
+    previewUrl = url;
+    showPreview = true;
 }
 
 function clickUpload() {

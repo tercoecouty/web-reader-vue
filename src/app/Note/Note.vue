@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { watch } from "vue";
+import { $ref, $toRef, $computed, $$ } from "vue/macros";
 
 import api from "../../api/Api";
 
@@ -17,70 +18,70 @@ const noteStore = useNoteStore();
 const commentStore = useCommentStore();
 const likeStore = useLikeStore();
 
-const currentNoteId = computed(() => bookStore.currentNoteId);
-const showNoteInfo = computed(() => appStore.showNoteInfo);
+const currentNoteId = $toRef(bookStore, "currentNoteId");
+const showNoteInfo = $toRef(appStore, "showNoteInfo");
 
-const commentsLoading = ref(true);
-const likesLoading = ref(true);
-const list = ref<"comments" | "likes">("comments");
-const showEdit = ref(false);
-const editType = ref<"editNote" | "addComment">("editNote");
-const editHeaderText = ref("");
-const editInitialText = ref("");
-const toUserId = ref<number>(null);
-const toUserName = ref<string>(null);
-const editImagesUrls = ref<string[]>([]);
+let commentsLoading = $ref(true);
+let likesLoading = $ref(true);
+let list = $ref<"comments" | "likes">("comments");
+let showEdit = $ref(false);
+let editType = $ref<"editNote" | "addComment">("editNote");
+let editHeaderText = $ref("");
+let editInitialText = $ref("");
+let toUserId = $ref<number>(null);
+let toUserName = $ref<string>(null);
+let editImagesUrls = $ref<string[]>([]);
 
-const note = computed(() => noteStore.notes.find((item) => item.id === currentNoteId.value));
-const comments = computed(() => commentStore.comments.filter((item) => item.noteId === currentNoteId.value));
-const likes = computed(() => likeStore.likes.filter((item) => item.noteId === currentNoteId.value));
-const liked = computed(() => likes.value.find((item) => item.userId === appStore.loginUser.id));
+const note = $computed(() => noteStore.notes.find((item) => item.id === currentNoteId));
+const comments = $computed(() => commentStore.comments.filter((item) => item.noteId === currentNoteId));
+const likes = $computed(() => likeStore.likes.filter((item) => item.noteId === currentNoteId));
+const liked = $computed(() => likes.find((item) => item.userId === appStore.loginUser.id));
 
 function editNote() {
-    editType.value = "editNote";
-    editHeaderText.value = "修改笔记";
-    editInitialText.value = note.value.content;
-    editImagesUrls.value = note.value.imageUrls;
-    showEdit.value = true;
+    editType = "editNote";
+    editHeaderText = "修改笔记";
+    editInitialText = note.content;
+    editImagesUrls = note.imageUrls;
+    showEdit = true;
 }
 function handleAddComment() {
-    editType.value = "addComment";
-    editHeaderText.value = "添加评论";
-    toUserId.value = null;
-    toUserName.value = null;
-    editInitialText.value = "";
-    editImagesUrls.value = [];
-    showEdit.value = true;
+    editType = "addComment";
+    editHeaderText = "添加评论";
+    toUserId = null;
+    toUserName = null;
+    editInitialText = "";
+    editImagesUrls = [];
+    showEdit = true;
 }
 
 function handleReplyComment(fromUserId: number, fromUserName: string) {
-    toUserId.value = fromUserId;
-    toUserName.value = fromUserName;
-    editType.value = "addComment";
-    editInitialText.value = "";
-    editImagesUrls.value = [];
-    editHeaderText.value = "回复" + fromUserName;
-    showEdit.value = true;
+    toUserId = fromUserId;
+    toUserName = fromUserName;
+    editType = "addComment";
+    editInitialText = "";
+    editImagesUrls = [];
+    editHeaderText = "回复" + fromUserName;
+    showEdit = true;
 }
 async function handleSubmit(text: string, files: File[]) {
-    if (editType.value === "editNote") {
-        noteStore.updateNote(currentNoteId.value, text, files);
-    } else if ((editType.value = "addComment")) {
-        commentStore.addComment(currentNoteId.value, toUserId.value, toUserName.value, text, files);
+    if (editType === "editNote") {
+        noteStore.updateNote(currentNoteId, text, files);
+    } else if ((editType = "addComment")) {
+        commentStore.addComment(currentNoteId, toUserId, toUserName, text, files);
     }
 }
-watch(currentNoteId, async () => {
-    const _likes = await api.getLikes(currentNoteId.value);
-    const _comments = await api.getComments(currentNoteId.value);
-    likesLoading.value = false;
-    commentsLoading.value = false;
+watch($$(currentNoteId), async () => {
+    const _likes = await api.getLikes(currentNoteId);
+    const _comments = await api.getComments(currentNoteId);
+    likesLoading = false;
+    commentsLoading = false;
     likeStore.likes = _likes;
     commentStore.comments = _comments;
 });
-watch(showNoteInfo, () => {
-    if (!showNoteInfo.value) {
-        showEdit.value = false;
-        list.value = "comments";
+watch($$(showNoteInfo), () => {
+    if (!showNoteInfo) {
+        showEdit = false;
+        list = "comments";
     }
 });
 </script>

@@ -31,7 +31,7 @@ const domNotes = computed(() => {
 function handleClick(noteId: number, pageNumber: number) {
     bookStore.setPageNumber(pageNumber);
     bookStore.currentNoteId = noteId;
-    appStore.setShowNotes(false);
+    appStore.showNotes = false;
 }
 </script>
 

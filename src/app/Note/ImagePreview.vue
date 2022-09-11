@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { onMounted } from "vue";
+import { $ref } from "vue/macros";
 import { Icon } from "../../component";
 import { ArrowLeftSvg, ArrowRightSvg } from "../../svg";
 
@@ -12,33 +13,33 @@ interface IImagePreviewEmits {
 }
 
 const emit = defineEmits<IImagePreviewEmits>();
-const props = defineProps<IImagePreviewProps>();
-const show = ref(false);
-const index = ref(0);
+const { urls, currentUrl } = defineProps<IImagePreviewProps>();
+let show = $ref(false);
+let index = $ref(0);
 
 onMounted(() => {
-    const _index = props.urls.indexOf(props.currentUrl);
-    if (_index !== -1) index.value = _index;
-    requestAnimationFrame(() => (show.value = true));
+    const _index = urls.indexOf(currentUrl);
+    if (_index !== -1) index = _index;
+    requestAnimationFrame(() => (show = true));
 });
 
 function handleTransEnd(e) {
-    if (!show.value && e.propertyName === "transform") emit("close");
+    if (!show && e.propertyName === "transform") emit("close");
 }
 
 function nextImage() {
-    if (index.value === 0) {
-        index.value = props.urls.length - 1;
+    if (index === 0) {
+        index = urls.length - 1;
     } else {
-        index.value = index.value - 1;
+        index = index - 1;
     }
 }
 
 function prevImage() {
-    if (index.value === props.urls.length - 1) {
-        index.value = 0;
+    if (index === urls.length - 1) {
+        index = 0;
     } else {
-        index.value = index.value + 1;
+        index = index + 1;
     }
 }
 </script>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, computed, watch } from "vue";
+import { onMounted, watch } from "vue";
+import { $ref, $computed, $$ } from "vue/macros";
 import Page from "./Page.vue";
 import BookLayout from "./bookLayout";
 import api from "../../api/Api";
@@ -20,12 +21,12 @@ const bookshelfStore = useBookshelfStore();
 const noteStore = useNoteStore();
 const classStore = useClassStore();
 
-const bookText = ref("");
-const resizeTimeoutId = ref(null);
-const bookId = computed(() => appStore.bookId);
-const noteUser = computed(() => appStore.noteUser);
-const lineSpacing = computed(() => bookStore.lineSpacing);
-const indent = computed(() => bookStore.indent);
+let bookText = $ref("");
+let resizeTimeoutId = $ref(null);
+const bookId = $computed(() => appStore.bookId);
+const noteUser = $computed(() => appStore.noteUser);
+const lineSpacing = $computed(() => bookStore.lineSpacing);
+const indent = $computed(() => bookStore.indent);
 
 function updatePage(_bookText: string, charId?: number) {
     const domPageContent = document.getElementById("page-content");
@@ -33,8 +34,8 @@ function updatePage(_bookText: string, charId?: number) {
     const domMeasure = document.getElementById("char-measurement");
 
     const layoutOptions = {
-        lineSpacing: lineSpacing.value,
-        indent: indent.value,
+        lineSpacing: lineSpacing,
+        indent: indent,
     };
     const book = new BookLayout(_bookText, totalWidth, totalHeight, domMeasure, layoutOptions);
     const pages = book.pageBreaking();
@@ -76,38 +77,38 @@ onMounted(() => {
 
 onMounted(() => {
     window.onresize = () => {
-        clearTimeout(resizeTimeoutId.value);
+        clearTimeout(resizeTimeoutId);
         const charId = (document.querySelector(".line>span") as HTMLElement)?.dataset.firstCharId;
 
         bookStore.pageLoading = true;
-        const timer = setTimeout(() => updatePage(bookText.value, parseInt(charId)), 1000); // 有意增加加载时间
-        resizeTimeoutId.value = timer;
+        const timer = setTimeout(() => updatePage(bookText, parseInt(charId)), 1000); // 有意增加加载时间
+        resizeTimeoutId = timer;
     };
 });
 
-watch(bookId, async () => {
+watch($$(bookId), async () => {
     bookStore.pageLoading = true;
-    const _bookText = await api.getBookText(bookId.value);
-    bookText.value = _bookText;
+    const _bookText = await api.getBookText(bookId);
+    bookText = _bookText;
     setTimeout(() => updatePage(_bookText), 300); // 有意增加一些加载时间
     if (noteUser) {
-        noteStore.fetchNotes(noteUser.value.id);
-        bookmarkStore.fetchBookmarks(noteUser.value.id);
+        noteStore.fetchNotes(noteUser.id);
+        bookmarkStore.fetchBookmarks(noteUser.id);
     }
 });
 
-watch(noteUser, async () => {
-    await noteStore.fetchNotes(noteUser.value.id);
-    await bookmarkStore.fetchBookmarks(noteUser.value.id);
+watch($$(noteUser), async () => {
+    await noteStore.fetchNotes(noteUser.id);
+    await bookmarkStore.fetchBookmarks(noteUser.id);
 });
 
-watch([lineSpacing, indent], () => {
+watch([$$(lineSpacing), $$(indent)], () => {
     const dom = document.querySelector(".line>span") as HTMLElement;
     if (!dom) return;
 
     const charId = dom.dataset.firstCharId;
     bookStore.pageLoading = true;
-    setTimeout(() => updatePage(bookText.value, parseInt(charId)), 1000); // 有意增加加载时间
+    setTimeout(() => updatePage(bookText, parseInt(charId)), 1000); // 有意增加加载时间
 });
 
 function handleMouseUp() {

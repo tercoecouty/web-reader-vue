@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { watch, onMounted } from "vue";
+import { $toRef, $$ } from "vue/macros";
 import { Icon, Drawer } from "../../component";
 import { ArrowLeftSvg, ArrowRightSvg, UnderlineSvg, EditSvg, DeleteSvg, EyeSvg } from "../../svg";
 import { useAppStore, useBookStore, useNoteStore } from "../../store";
@@ -9,6 +10,8 @@ import Note from "../Note/Note.vue";
 const appStore = useAppStore();
 const bookStore = useBookStore();
 const noteStore = useNoteStore();
+let currentNoteId = $toRef(bookStore, "currentNoteId");
+
 function handleAddNote() {
     if (!bookStore.selection || appStore.noteUser.id !== appStore.loginUser.id) return;
 
@@ -30,8 +33,8 @@ function handleDeleteNote() {
     if (appStore.noteUser.id !== appStore.loginUser.id) return;
     if (!window.confirm("您确定要删除笔记吗？")) return;
 
-    noteStore.deleteNote(bookStore.currentNoteId);
-    bookStore.currentNoteId = null;
+    noteStore.deleteNote(currentNoteId);
+    currentNoteId = null;
 }
 function handlePrevPage() {
     if (bookStore.pageNumber === 1) return;
@@ -60,8 +63,8 @@ function handleKeyEvent(e: KeyboardEvent) {
             handleNextPage();
             break;
         case "Enter":
-            if (bookStore.currentNoteId) {
-                appStore.setShowNoteInfo(true);
+            if (currentNoteId) {
+                appStore.showNoteInfo = true;
                 break;
             }
 
@@ -79,14 +82,11 @@ onMounted(() => {
     window.onkeydown = handleKeyEvent;
 });
 
-watch(
-    () => bookStore.currentNoteId,
-    () => {
-        if (bookStore.currentNoteId && appStore.noteUser.id !== appStore.loginUser.id) {
-            appStore.showNoteInfo = true;
-        }
+watch($$(currentNoteId), () => {
+    if (currentNoteId && appStore.noteUser.id !== appStore.loginUser.id) {
+        appStore.showNoteInfo = true;
     }
-);
+});
 </script>
 
 <template>
@@ -101,19 +101,14 @@ watch(
         <Icon
             :svg="DeleteSvg"
             @click="handleDeleteNote"
-            :disabled="!bookStore.currentNoteId || appStore.noteUser.id !== appStore.loginUser.id"
+            :disabled="!currentNoteId || appStore.noteUser.id !== appStore.loginUser.id"
         />
         <Icon
             :svg="appStore.noteUser?.id === appStore.loginUser?.id ? EditSvg : EyeSvg"
-            @click="appStore.setShowNoteInfo(true)"
-            :disabled="!bookStore.currentNoteId"
+            @click="appStore.showNoteInfo = true"
+            :disabled="!currentNoteId"
         />
-        <Drawer
-            v-model:visible="appStore.showNoteInfo"
-            position="right"
-            @close="bookStore.currentNoteId = null"
-            width="30%"
-        >
+        <Drawer v-model:visible="appStore.showNoteInfo" position="right" @close="currentNoteId = null" width="30%">
             <Note />
         </Drawer>
     </div>

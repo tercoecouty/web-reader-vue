@@ -11,7 +11,7 @@ function handleChange(e: any) {
 }
 function clickUser(user: IUser) {
     appStore.noteUser = user;
-    appStore.setShowClasses(false);
+    appStore.showClasses = false;
 }
 </script>
 

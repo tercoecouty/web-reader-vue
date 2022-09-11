@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { onMounted } from "vue";
+import { $ref, $computed } from "vue/macros";
 import { Icon } from "../../component";
 import { ArrowLeftSvg, SendSvg } from "../../svg";
 import NoteImages from "./NoteImages.vue";
@@ -16,31 +17,32 @@ interface INoteEditEmits {
 
 const emit = defineEmits<INoteEditEmits>();
 const props = defineProps<INoteEditProps>();
-const headerText = computed(() => props.headerText || "返回");
-const show = ref(false);
-const text = ref(props.initialText || "");
-const fileMap = ref<Map<string, File>>(new Map(props.imagesUrls.map((url) => [url, null])));
-const hasChange = ref(false);
+const { initialText, imagesUrls } = props;
+let headerText = $computed(() => props.headerText || "返回");
+let show = $ref(false);
+let text = $ref(initialText || "");
+let fileMap = $ref<Map<string, File>>(new Map(imagesUrls.map((url) => [url, null])));
+let hasChange = $ref(false);
 
 onMounted(() => {
     requestAnimationFrame(() => {
-        show.value = true;
+        show = true;
     });
 });
 
 function handleTransEnd() {
-    if (show.value) {
+    if (show) {
         const dom = document.getElementById("note-edit-textarea") as HTMLInputElement;
         dom.focus();
-        dom.setSelectionRange(text.value.length, text.value.length);
+        dom.setSelectionRange(text.length, text.length);
     } else {
         emit("close");
     }
 }
 function handleChange(e) {
     if (e.target.value.length > 200) return;
-    text.value = e.target.value;
-    hasChange.value = true;
+    text = e.target.value;
+    hasChange = true;
 
     // 文本框随着输入文字的改变自动伸长或缩短
     // 参考 https://stackoverflow.com/questions/454202/creating-a-textarea-with-auto-resize
@@ -49,37 +51,37 @@ function handleChange(e) {
     dom.style.height = dom.scrollHeight + "px";
 }
 function handleUpload(files: File[]) {
-    if (fileMap.value.size + files.length > 9) {
+    if (fileMap.size + files.length > 9) {
         alert("图片数量不能超过九张");
         return;
     }
 
     for (const file of files) {
         const url = URL.createObjectURL(file);
-        fileMap.value.set(url, file);
+        fileMap.set(url, file);
     }
 
-    fileMap.value = new Map(fileMap.value);
-    hasChange.value = true;
+    fileMap = new Map(fileMap);
+    hasChange = true;
 }
 function deleteImage(url: string) {
-    fileMap.value.delete(url);
+    fileMap.delete(url);
     (document.getElementById("image-file-input") as any).value = "";
-    fileMap.value = new Map(fileMap.value);
-    hasChange.value = true;
+    fileMap = new Map(fileMap);
+    hasChange = true;
 }
 async function submit() {
-    if (!hasChange.value) return;
+    if (!hasChange) return;
     const files: File[] = [];
-    for (const url of fileMap.value.keys()) {
+    for (const url of fileMap.keys()) {
         const res = await fetch(url);
         const blob = await res.blob();
         const file = new File([blob], "");
         URL.revokeObjectURL(url);
         files.push(file);
     }
-    emit("submit", text.value, files);
-    show.value = false;
+    emit("submit", text, files);
+    show = false;
 }
 </script>
 
