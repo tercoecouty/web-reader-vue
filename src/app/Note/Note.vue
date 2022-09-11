@@ -159,8 +159,8 @@ watch(showNoteInfo, () => {
             :initialText="editInitialText"
             :headerText="editHeaderText"
             :imagesUrls="editImagesUrls"
-            :onClose="() => (showEdit = false)"
-            :onSubmit="handleSubmit"
+            @close="showEdit = false"
+            @submit="handleSubmit"
         />
     </div>
 </template>

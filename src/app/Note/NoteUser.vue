@@ -4,7 +4,7 @@ interface IUserInfoProps {
     dateTime: number;
 }
 
-const props = defineProps<IUserInfoProps>();
+defineProps<IUserInfoProps>();
 function relativeTime(timestamp: number) {
     const seconds = Math.floor((Date.now() - timestamp) / 1000);
 
@@ -37,8 +37,8 @@ function relativeTime(timestamp: number) {
 
 <template>
     <div class="note-user">
-        <span class="note-user-name">{{ props.name }}</span>
-        <span class="note-user-time">{{ relativeTime(props.dateTime) }}</span>
+        <span class="note-user-name">{{ name }}</span>
+        <span class="note-user-time">{{ relativeTime(dateTime) }}</span>
     </div>
 </template>
 

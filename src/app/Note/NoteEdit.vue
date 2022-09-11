@@ -8,14 +8,17 @@ interface INoteEditProps {
     initialText?: string;
     headerText?: string;
     imagesUrls?: string[];
-    onClose: () => void;
-    onSubmit: (text: string, files: File[]) => void;
+}
+interface INoteEditEmits {
+    (e: "close"): void;
+    (e: "submit", text: string, files: File[]): void;
 }
 
+const emit = defineEmits<INoteEditEmits>();
 const props = defineProps<INoteEditProps>();
 const headerText = computed(() => props.headerText || "返回");
 const show = ref(false);
-const value = ref(props.initialText || "");
+const text = ref(props.initialText || "");
 const fileMap = ref<Map<string, File>>(new Map(props.imagesUrls.map((url) => [url, null])));
 const hasChange = ref(false);
 
@@ -29,14 +32,14 @@ function handleTransEnd() {
     if (show.value) {
         const dom = document.getElementById("note-edit-textarea") as HTMLInputElement;
         dom.focus();
-        dom.setSelectionRange(value.value.length, value.value.length);
+        dom.setSelectionRange(text.value.length, text.value.length);
     } else {
-        props.onClose();
+        emit("close");
     }
 }
 function handleChange(e) {
     if (e.target.value.length > 200) return;
-    value.value = e.target.value;
+    text.value = e.target.value;
     hasChange.value = true;
 
     // 文本框随着输入文字的改变自动伸长或缩短
@@ -75,7 +78,7 @@ async function submit() {
         URL.revokeObjectURL(url);
         files.push(file);
     }
-    props.onSubmit(value.value, files);
+    emit("submit", text.value, files);
     show.value = false;
 }
 </script>
@@ -87,16 +90,17 @@ async function submit() {
             <span class="header-text">{{ headerText }}</span>
         </div>
         <div class="scroll-container">
-            <textarea
-                id="note-edit-textarea"
-                :value="value"
-                @input="handleChange"
-                placeholder="在这里输入……"
-            ></textarea>
-            <NoteImages :urls="[...fileMap.keys()]" :onDelete="deleteImage" :onUpload="handleUpload" />
+            <textarea id="note-edit-textarea" :value="text" @input="handleChange" placeholder="在这里输入……"></textarea>
+            <NoteImages
+                :urls="[...fileMap.keys()]"
+                @delete="deleteImage"
+                @upload="handleUpload"
+                showUpload
+                showDelete
+            />
         </div>
         <div class="note-edit-submit">
-            <span class="letter-count">{{ value.length }} / 200</span>
+            <span class="letter-count">{{ text.length }} / 200</span>
             <Icon :svg="SendSvg" @click="submit" :disabled="!hasChange" />
         </div>
     </div>

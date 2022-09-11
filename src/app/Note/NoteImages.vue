@@ -7,16 +7,22 @@ import ImagePreview from "./ImagePreview.vue";
 
 interface INoteImagesProps {
     urls: string[];
-    onUpload?: (files: File[]) => void;
-    onDelete?: (url: string) => void;
+    showUpload?: boolean;
+    showDelete?: boolean;
 }
-const props = defineProps<INoteImagesProps>();
+interface INoteImagesEmits {
+    (e: "upload", files: File[]): void;
+    (e: "delete", url: string): void;
+}
+
+const emit = defineEmits<INoteImagesEmits>();
+defineProps<INoteImagesProps>();
 const previewUrl = ref("");
 const showPreview = ref(false);
 
 function handleFileChange(e) {
     const files = e.target.files as File[];
-    props.onUpload(files);
+    emit("upload", files);
 }
 
 function handleShowPreview(url: string) {
@@ -32,7 +38,7 @@ function clickUpload() {
 <template>
     <div class="note-edit-images">
         <input
-            v-if="props.onUpload"
+            v-if="showUpload"
             class="image-file-input"
             id="image-file-input"
             type="file"
@@ -40,25 +46,20 @@ function clickUpload() {
             @input="handleFileChange"
             multiple
         />
-        <div v-for="url in props.urls" class="image-item" :key="url">
+        <div v-for="url in urls" class="image-item" :key="url">
             <img :src="url" />
             <div class="image-item-hover">
-                <Icon v-if="props.onDelete" :svg="DeleteSvg" @click="props.onDelete(url)" />
+                <Icon v-if="showDelete" :svg="DeleteSvg" @click="$emit('delete', url)" />
                 <Icon :svg="EyeSvg" @click="handleShowPreview(url)" />
             </div>
         </div>
-        <div v-if="props.onUpload && props.urls.length < 9" class="image-upload" @click="clickUpload">
+        <div v-if="showUpload && urls.length < 9" class="image-upload" @click="clickUpload">
             <span>
                 <span></span>
                 <span></span>
             </span>
         </div>
-        <ImagePreview
-            v-if="showPreview"
-            :urls="props.urls"
-            :currentUrl="previewUrl"
-            :onClose="() => (showPreview = false)"
-        />
+        <ImagePreview v-if="showPreview" :urls="urls" :currentUrl="previewUrl" @close="showPreview = false" />
     </div>
 </template>
 

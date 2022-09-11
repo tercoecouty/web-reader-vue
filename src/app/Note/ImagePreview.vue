@@ -4,11 +4,14 @@ import { Icon } from "../../component";
 import { ArrowLeftSvg, ArrowRightSvg } from "../../svg";
 
 interface IImagePreviewProps {
-    onClose: () => void;
     urls: string[];
     currentUrl: string;
 }
+interface IImagePreviewEmits {
+    (e: "close"): void;
+}
 
+const emit = defineEmits<IImagePreviewEmits>();
 const props = defineProps<IImagePreviewProps>();
 const show = ref(false);
 const index = ref(0);
@@ -20,7 +23,7 @@ onMounted(() => {
 });
 
 function handleTransEnd(e) {
-    if (!show.value && e.propertyName === "transform") props.onClose();
+    if (!show.value && e.propertyName === "transform") emit("close");
 }
 
 function nextImage() {
@@ -44,7 +47,7 @@ function prevImage() {
     <Teleport to="body">
         <div class="image-preview" :class="{ show }" @transitionend="handleTransEnd">
             <div class="image-preview-background" @click="show = false"></div>
-            <img :src="props.urls[index]" />
+            <img :src="urls[index]" />
             <span class="image-preview-arrow left">
                 <Icon :svg="ArrowLeftSvg" @click="prevImage" />
             </span>
