@@ -33,10 +33,6 @@ function handleDeleteNote() {
     noteStore.deleteNote(bookStore.currentNoteId);
     bookStore.currentNoteId = null;
 }
-function hideNoteInfo() {
-    appStore.setShowNoteInfo(false);
-    bookStore.currentNoteId = null;
-}
 function handlePrevPage() {
     if (bookStore.pageNumber === 1) return;
     bookStore.prevPage();
@@ -112,7 +108,12 @@ watch(
             @click="appStore.setShowNoteInfo(true)"
             :disabled="!bookStore.currentNoteId"
         />
-        <Drawer :visible="appStore.showNoteInfo" position="right" @close="hideNoteInfo" width="30%">
+        <Drawer
+            v-model:visible="appStore.showNoteInfo"
+            position="right"
+            @close="bookStore.currentNoteId = null"
+            width="30%"
+        >
             <Note />
         </Drawer>
     </div>

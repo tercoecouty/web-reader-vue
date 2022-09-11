@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { useAppStore } from "../store";
 
 interface IDrawerProps {
     visible: Boolean;
@@ -8,8 +9,10 @@ interface IDrawerProps {
 }
 interface IDrawerEmits {
     (e: "close"): void;
+    (e: "update:visible", value: boolean): void;
 }
 
+const appStore = useAppStore();
 const emit = defineEmits<IDrawerEmits>();
 const props = defineProps<IDrawerProps>();
 const show = ref(false);
@@ -20,9 +23,8 @@ watch(
     () => {
         if (props.visible) {
             _visible.value = true;
-            requestAnimationFrame(() => {
-                show.value = true;
-            });
+            appStore.disableShortcut = true;
+            requestAnimationFrame(() => (show.value = true));
         } else {
             show.value = false;
         }
@@ -32,7 +34,9 @@ watch(
 function handleTransEnd(e) {
     if (!show.value && e.propertyName === "transform") {
         emit("close");
+        emit("update:visible", false);
         _visible.value = false;
+        appStore.disableShortcut = false;
     }
 }
 </script>

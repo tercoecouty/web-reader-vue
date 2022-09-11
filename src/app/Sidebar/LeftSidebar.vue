@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { Icon, Drawer } from "../../component";
 import { TeamSvg, BarsSvg, SearchSvg, BookSvg, SettingSvg, BookshelfSvg } from "../../svg";
 import Classes from "../Classes.vue";
@@ -11,64 +12,36 @@ import Prompt from "./Prompt.vue";
 
 import { useAppStore } from "../../store";
 const appStore = useAppStore();
+const disableIcon = computed(() => appStore.noteUser?.id !== appStore.loginUser?.id);
 </script>
 
 <template>
     <div class="left-sidebar">
-        <Icon :svg="TeamSvg" @click="appStore.setShowClasses(true)" />
-        <Icon
-            :svg="BarsSvg"
-            @click="appStore.setShowNotes(true)"
-            :disabled="appStore.noteUser?.id !== appStore.loginUser?.id"
-        />
-        <Icon
-            :svg="BookSvg"
-            @click="appStore.setShowBookmarks(true)"
-            :disabled="appStore.noteUser?.id !== appStore.loginUser?.id"
-        />
-        <Icon
-            :svg="SearchSvg"
-            @click="appStore.setShowSearch(true)"
-            :disabled="appStore.noteUser?.id !== appStore.loginUser?.id"
-        />
-        <Icon
-            :svg="BookshelfSvg"
-            @click="appStore.setShowBookshelf(true)"
-            :disabled="appStore.noteUser?.id !== appStore.loginUser?.id"
-        />
-        <Icon
-            :svg="SettingSvg"
-            @click="appStore.setShowSettings(true)"
-            :disabled="appStore.noteUser?.id !== appStore.loginUser?.id"
-        />
-        <Drawer :visible="appStore.showClasses" title="班级列表" position="left" @close="appStore.showClasses = false">
+        <Icon :svg="TeamSvg" @click="appStore.showClasses = true" />
+        <Icon :svg="BarsSvg" @click="appStore.showNotes = true" :disabled="disableIcon" />
+        <Icon :svg="BookSvg" @click="appStore.showBookmarks = true" :disabled="disableIcon" />
+        <Icon :svg="SearchSvg" @click="appStore.showSearch = true" :disabled="disableIcon" />
+        <Icon :svg="BookshelfSvg" @click="appStore.showBookshelf = true" :disabled="disableIcon" />
+        <Icon :svg="SettingSvg" @click="appStore.showSettings = true" :disabled="disableIcon" />
+        <Drawer v-model:visible="appStore.showClasses" title="班级列表" position="left">
             <Classes />
         </Drawer>
-        <Drawer :visible="appStore.showNotes" title="笔记" position="left" @close="appStore.showNotes = false">
+        <Drawer v-model:visible="appStore.showNotes" title="笔记" position="left">
             <Notes />
         </Drawer>
-        <Drawer :visible="appStore.showBookmarks" title="书签" position="left" @close="appStore.showBookmarks = false">
+        <Drawer v-model:visible="appStore.showBookmarks" title="书签" position="left">
             <Bookmarks />
         </Drawer>
-        <Drawer :visible="appStore.showSearch" title="搜索" position="left" @close="appStore.showSearch = false">
+        <Drawer v-model:visible="appStore.showSearch" title="搜索" position="left">
             <Search />
         </Drawer>
-        <Drawer
-            :visible="appStore.showBookshelf"
-            title="班级书架"
-            position="left"
-            @close="appStore.showBookshelf = false"
-        >
+        <Drawer v-model:visible="appStore.showBookshelf" title="班级书架" position="left">
             <Bookshelf />
         </Drawer>
-        <Drawer :visible="appStore.showSettings" title="搜索" position="left" @close="appStore.showSettings = false">
+        <Drawer v-model:visible="appStore.showSettings" title="搜索" position="left">
             <Settings />
         </Drawer>
-        <Prompt
-            v-if="appStore.noteUser?.id !== appStore.loginUser?.id"
-            :userName="appStore.noteUser.name"
-            @close="appStore.noteUser = appStore.loginUser"
-        />
+        <Prompt v-if="disableIcon" :userName="appStore.noteUser.name" @close="appStore.noteUser = appStore.loginUser" />
     </div>
 </template>
 

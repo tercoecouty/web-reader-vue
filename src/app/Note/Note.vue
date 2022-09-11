@@ -86,7 +86,7 @@ watch(showNoteInfo, () => {
 </script>
 
 <template>
-    <div v-if="note" class="overflow-container">
+    <div v-if="note && appStore.showNoteInfo" class="overflow-container">
         <div class="note">
             <NoteUser :name="note.userName" :dateTime="note.dateTime" />
             <div class="note-text">{{ note.text }}</div>
